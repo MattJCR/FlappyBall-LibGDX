@@ -25,7 +25,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 public class GameScreen implements Screen {
   	final Gotas game;
         final float GRAVITY = -8f;
-        final float MAX_VELOCITY = 90f;
+        final float MAX_VELOCITY = 70f;
         float yVelocity = 0;
         int sizeTube = 0;
         int space = 540;
@@ -43,10 +43,14 @@ public class GameScreen implements Screen {
 	int dropsGathered;
         int pointsDrops;
         int dropsFails;
-
+        boolean levelUp;
+        int levelChange, lastLevel;
+        int dificulty;
+        boolean godMode = false;
+        double multiA = 2.2,multiB = 1.8;
 	public GameScreen(final Gotas gam) {
 		this.game = gam;
-                
+                levelUp = false;
 		// load the images for the droplet and the bucket, 64x64 pixels each
 		tubeImageDown = new Texture(Gdx.files.internal("bottomtube.png"));
                 tubeImageUp = new Texture(Gdx.files.internal("uptube.png"));
@@ -71,7 +75,9 @@ public class GameScreen implements Screen {
                 
                 pointsDrops = 0;
                 dropsFails = 0;
-
+                lastLevel = 0;
+                dificulty = 0;
+                levelChange = lastLevel + 10 + MathUtils.random(0, 20);
 		// create the raindrops array and spawn the first raindrop
 		tubedropsDown = new Array<Rectangle>();
                 tubedropsUp = new Array<Rectangle>();
@@ -96,6 +102,7 @@ public class GameScreen implements Screen {
 		tubedropsUp.add(tubedrop);
 		lastDropTime = TimeUtils.nanoTime();
 	}
+        
 
 	@Override
 	public void render(float delta) {
@@ -124,7 +131,21 @@ public class GameScreen implements Screen {
 		}
                 game.font.draw(game.batch, "SCORE = " + pointsDrops, 700, 450);
 		game.batch.end();
-
+                if (!levelUp && lastLevel > levelChange) {
+                    levelUp = true;
+                    levelChange = lastLevel + 10 + MathUtils.random(0, 20);
+                    tubeImageDown = new Texture(Gdx.files.internal("uptubeX.png"));
+                    tubeImageUp = new Texture(Gdx.files.internal("bottomtubeX.png"));
+                    dificulty = levelChange;
+                }else if (levelUp && lastLevel > levelChange) {
+                    levelUp = false;
+                    levelChange = lastLevel + 10 + MathUtils.random(0, 20);
+                    tubeImageDown = new Texture(Gdx.files.internal("bottomtube.png"));
+                    tubeImageUp = new Texture(Gdx.files.internal("uptube.png"));
+                    dificulty = levelChange;
+                }else{
+                    lastLevel = pointsDrops;
+                }
 		// process user input
 		if (Gdx.input.isTouched() && TimeUtils.nanoTime() - lastJumpTime > 150000000 ) {
                     yVelocity = yVelocity + MAX_VELOCITY * 4;
@@ -137,19 +158,24 @@ public class GameScreen implements Screen {
                     wingSound.play(1);
                 }
                 
+                
 		yVelocity = yVelocity + GRAVITY;
                 float yChange = yVelocity * delta;
                 flappy.y = flappy.y + yChange;
 		// make sure the bucket stays within the screen bounds
 		if (flappy.y < 0){
                     flappy.y = 0;
-                    game.setScreen(new EndGameScreen(game,pointsDrops));
-                    dispose();
+                    if (!godMode) {
+                        game.setScreen(new EndGameScreen(game,pointsDrops));
+                        dispose();
+                    }
                 }
 		if (flappy.y > 480){
                     flappy.y = 480;
-                    game.setScreen(new EndGameScreen(game,pointsDrops));
-                    dispose();
+                    if (!godMode) {
+                        game.setScreen(new EndGameScreen(game,pointsDrops));
+                        dispose();
+                    }
                 }
 			
 
@@ -168,26 +194,39 @@ public class GameScreen implements Screen {
 		while (iterDown.hasNext() || iterUp.hasNext()) {
                     if (iterDown.hasNext()) {
                         Rectangle tubedropDown = iterDown.next();
-                        tubedropDown.x -= (200 + (pointsDrops*2)) * Gdx.graphics.getDeltaTime();
+                        if (levelUp) {
+                            tubedropDown.x -= (200 + (dificulty/1.5*multiA)) * Gdx.graphics.getDeltaTime();
+                        }else{
+                            tubedropDown.x -= (200 + (dificulty/1.5*multiB)) * Gdx.graphics.getDeltaTime();
+                        }
                         if (tubedropDown.x + 64 < 0){
                             pointSound.play(1);
                             iterDown.remove();
                         }
                         if (tubedropDown.overlaps(flappy)) {
-				game.setScreen(new EndGameScreen(game,pointsDrops));
+                            if (!godMode) {
+                                game.setScreen(new EndGameScreen(game,pointsDrops));
                                 dispose();
+                            }
+				
 			}
                     }
                     if (iterUp.hasNext()) {
                         Rectangle tubedropUp = iterUp.next();
-                        tubedropUp.x -= (200 + (pointsDrops*2)) * Gdx.graphics.getDeltaTime();
+                        if (levelUp) {
+                            tubedropUp.x -= (200 + (dificulty/1.5*multiB)) * Gdx.graphics.getDeltaTime();
+                        }else{
+                            tubedropUp.x -= (200 + (dificulty/1.5*multiA)) * Gdx.graphics.getDeltaTime();
+                        }
                         if (tubedropUp.x + 64 < 0){
                             iterUp.remove();
                             pointsDrops+= 5;
                         }
                         if (tubedropUp.overlaps(flappy)) {
-				game.setScreen(new EndGameScreen(game,pointsDrops));
+                            if (!godMode) {
+                                game.setScreen(new EndGameScreen(game,pointsDrops));
                                 dispose();
+                            }
 			}
                     }	
 		}
