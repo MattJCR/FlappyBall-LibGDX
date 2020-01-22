@@ -23,9 +23,9 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 
 public class GameScreen implements Screen {
-  	final Gotas game;
-        final float GRAVITY = -8f;
-        final float MAX_VELOCITY = 70f;
+  	final Flappy game;
+        final float GRAVITY = -16f;
+        final float MAX_VELOCITY = 400f;
         float yVelocity = 0;
         int sizeTube = 0;
         int space = 540;
@@ -38,9 +38,8 @@ public class GameScreen implements Screen {
 	OrthographicCamera camera;
 	Rectangle flappy;
 	Array<Rectangle> tubedropsDown,tubedropsUp;
-	long lastDropTime;
+	long lastSpawnTime;
         long lastJumpTime;
-	int dropsGathered;
         int pointsDrops;
         int dropsFails;
         boolean levelUp;
@@ -48,7 +47,7 @@ public class GameScreen implements Screen {
         int dificulty;
         boolean godMode = false;
         double multiA = 2.2,multiB = 1.8;
-	public GameScreen(final Gotas gam) {
+	public GameScreen(final Flappy gam) {
 		this.game = gam;
                 levelUp = false;
 		// load the images for the droplet and the bucket, 64x64 pixels each
@@ -91,7 +90,7 @@ public class GameScreen implements Screen {
 		tubedrop.width = tubeImageDown.getWidth();
 		tubedrop.height = tubeImageDown.getHeight();
 		tubedropsDown.add(tubedrop);
-		lastDropTime = TimeUtils.nanoTime();
+		lastSpawnTime = TimeUtils.nanoTime();
 	}
         private void spawnTubedropUp() {
 		Rectangle tubedrop = new Rectangle();
@@ -100,7 +99,7 @@ public class GameScreen implements Screen {
 		tubedrop.width = tubeImageUp.getWidth();
 		tubedrop.height = tubeImageUp.getHeight();
 		tubedropsUp.add(tubedrop);
-		lastDropTime = TimeUtils.nanoTime();
+		lastSpawnTime = TimeUtils.nanoTime();
 	}
         
 
@@ -147,13 +146,13 @@ public class GameScreen implements Screen {
                     lastLevel = pointsDrops;
                 }
 		// process user input
-		if (Gdx.input.isTouched() && TimeUtils.nanoTime() - lastJumpTime > 150000000 ) {
-                    yVelocity = yVelocity + MAX_VELOCITY * 4;
+		if (Gdx.input.justTouched() && TimeUtils.nanoTime() - lastJumpTime > 150000000 ) {
+                    yVelocity = yVelocity + MAX_VELOCITY;
                     lastJumpTime = TimeUtils.nanoTime();
                     wingSound.play(1);
 		}
 		if (Gdx.input.isKeyPressed(Keys.UP) && TimeUtils.nanoTime() - lastJumpTime > 150000000 ){
-                    yVelocity = yVelocity + MAX_VELOCITY * 4;
+                    yVelocity = yVelocity + MAX_VELOCITY;
                     lastJumpTime = TimeUtils.nanoTime();
                     wingSound.play(1);
                 }
@@ -180,7 +179,7 @@ public class GameScreen implements Screen {
 			
 
 		// check if we need to create a new raindrop
-		if (TimeUtils.nanoTime() - lastDropTime > 2000000000){
+		if (TimeUtils.nanoTime() - lastSpawnTime > 2000000000){
                     spawnTubedropDown();
                     spawnTubedropUp();
                 }
@@ -264,7 +263,6 @@ public class GameScreen implements Screen {
             tubeImageUp.dispose();
             backgroudI.dispose();
             wingSound.dispose();
-
 	}
 
 }

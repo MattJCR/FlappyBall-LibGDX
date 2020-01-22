@@ -18,13 +18,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class EndGameScreen implements Screen {
-        final Gotas game;
+        final Flappy game;
 	OrthographicCamera camera;
         int points;
         Texture backgroudI;
         Music musicLose;
         long time;
-	public EndGameScreen(final Gotas gam, int p) {
+	public EndGameScreen(final Flappy gam, int p) {
 		game = gam;
                 points = p;
 		camera = new OrthographicCamera();

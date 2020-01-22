@@ -13,11 +13,11 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.TimeUtils;
 
 public class MainMenuScreen implements Screen {
-        final Gotas game;
+        final Flappy game;
 	OrthographicCamera camera;
         Texture backgroudI;
         long time;
-	public MainMenuScreen(final Gotas gam) {
+	public MainMenuScreen(final Flappy gam) {
 		game = gam;
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 800, 480);
@@ -68,5 +68,6 @@ public class MainMenuScreen implements Screen {
 
 	@Override
 	public void dispose() {
+            backgroudI.dispose();
 	}
 }
