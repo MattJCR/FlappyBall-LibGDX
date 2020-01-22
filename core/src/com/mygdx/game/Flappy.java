@@ -1,8 +1,10 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import static javafx.scene.text.Font.font;
 
 public class Flappy extends Game {
 
@@ -13,6 +15,7 @@ public class Flappy extends Game {
 		batch = new SpriteBatch();
 		// Use LibGDX's default Arial font.
 		font = new BitmapFont();
+                font = new BitmapFont(Gdx.files.internal("fuente.fnt"));
 		this.setScreen(new MainMenuScreen(this));
 	}
 

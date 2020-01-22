@@ -128,7 +128,7 @@ public class GameScreen implements Screen {
                 for (Rectangle tubedrop : tubedropsUp) {
 			game.batch.draw(tubeImageUp, tubedrop.x, tubedrop.y, tubedrop.getWidth(),tubedrop.getHeight());
 		}
-                game.font.draw(game.batch, "SCORE = " + pointsDrops, 700, 450);
+                game.font.draw(game.batch, "SCORE = " + pointsDrops, 600, 450);
 		game.batch.end();
                 if (!levelUp && lastLevel > levelChange) {
                     levelUp = true;
